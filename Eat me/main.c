@@ -9,10 +9,10 @@
 #define HauteurFenetre 720
 
 typedef struct individu {
+	int xVitesse, yVitesse;
 	float xProb, yProb;
 	float x, y;
 	int panier;
-	int vitesse;
 	int total;
 } individu;
 
@@ -35,16 +35,21 @@ void generationIndividu(individu tabIndividu[10]) {
 	for (int i = 0; i < 10; i++) {
 		tabIndividu[i].panier = 0;
 		tabIndividu[i].total = 0;
+		// Démarrage au centre de la maison
 		tabIndividu[i].x = largeurFenetre()/2;
 		tabIndividu[i].y = hauteurFenetre()/2+hauteurFenetre()/16;
-		tabIndividu[i].xProb = valeurIntervalleZeroUn();
-		tabIndividu[i].yProb = valeurIntervalleZeroUn();
-		tabIndividu[i].vitesse = valeurIntervalleZeroUn()*4+1;
+		// Probalité de changer de direction (entre 1% et 6%)
+		tabIndividu[i].xProb = valeurIntervalleZeroUn()*6+1;
+		tabIndividu[i].yProb = valeurIntervalleZeroUn()*6+1;
+		// Vitesse en abscisse (entre 1 et 5)
+		tabIndividu[i].xVitesse = valeurIntervalleZeroUn()*4+1;
+		// Vitesse en ordonnée (entre 1 et 5)
+		tabIndividu[i].yVitesse = valeurIntervalleZeroUn()*4+1;
 	}
 }
 
 void generationNourriture(nourriture tabNourriture[20]) {
-	// Génération de la nourriture
+	// Génération de la nourriture aléatoirement sur le terrain
 	for (int i = 0; i < 20; i++) {
 		tabNourriture[i].x = 0;
 		tabNourriture[i].y = 0;
@@ -56,7 +61,7 @@ void generationNourriture(nourriture tabNourriture[20]) {
 }
 
 void afficheIndividu(individu tabIndividu[10]) {
-	// Affiche les individus
+	// Affiche les individus avec leur score
 	char scoreIndividu[100];
 	for (int i = 0; i < 10; i++) {
 		couleurCourante(0, 0, 215);
@@ -76,10 +81,15 @@ void afficheNourriture(nourriture tabNourriture[20]) {
 }
 
 void deplacement(individu tabIndividu[10]) {
-	// Déplacement aléatoire de l'individu en fonction de ses gene
+	// Déplacement aléatoire de l'individu selon ses caractéristiques
 	for (int i = 0; i < 10; i++) {
-		tabIndividu[i].x = valeurIntervalleZeroUn() > tabIndividu[i].xProb ? tabIndividu[i].x - tabIndividu[i].vitesse : tabIndividu[i].x + tabIndividu[i].vitesse;
-		tabIndividu[i].y = valeurIntervalleZeroUn() > tabIndividu[i].yProb ? tabIndividu[i].y - tabIndividu[i].vitesse : tabIndividu[i].y + tabIndividu[i].vitesse;
+		// Détermine si changement de direction
+		tabIndividu[i].xVitesse = valeurIntervalleZeroUn()*100 <= tabIndividu[i].xProb ? -tabIndividu[i].xVitesse : tabIndividu[i].xVitesse;
+		tabIndividu[i].yVitesse = valeurIntervalleZeroUn()*100 <= tabIndividu[i].yProb ? -tabIndividu[i].yVitesse : tabIndividu[i].yVitesse;
+		// Déplacement de l'individu
+		tabIndividu[i].x += tabIndividu[i].xVitesse;
+		tabIndividu[i].y += tabIndividu[i].yVitesse;
+		// Dans le cas où notre individu arrive en bord de zone
 		if (tabIndividu[i].x > largeurFenetre()+30)
 			tabIndividu[i].x = -30;
 		else if (tabIndividu[i].x < -30)
@@ -118,11 +128,15 @@ void ramasse(individu tabIndividu[10], nourriture tabNourriture[20], int *score)
 }
 
 void acceleration(individu tabIndividu[10], bool accelerate) {
+	// Augmente ou réduit la vitesse des individus
 	for (int i = 0; i < 10; i++) {
-		if (accelerate)
-			tabIndividu[i].vitesse *= 2;
-		else
-			tabIndividu[i].vitesse /= 2;
+		if (accelerate) {
+			tabIndividu[i].xVitesse *= 2;
+			tabIndividu[i].yVitesse *= 2;
+		} else {
+			tabIndividu[i].xVitesse /= 2;
+			tabIndividu[i].yVitesse /= 2;
+		}
 	}
 }
 
@@ -153,18 +167,22 @@ void selection(individu tabIndividu[10]) {
 	for (int i = 0; i < 10; i++) {
 		tabIndividu[i] = newIndividu[i];
 		if (valeurIntervalleZeroUn() >= 0.85) {
-			alea = valeurIntervalleZeroUn()*3;
+			alea = valeurIntervalleZeroUn()*4;
 			switch(alea) {
 				case 0:
-					tabIndividu[i].xProb = valeurIntervalleZeroUn();
+					tabIndividu[i].xProb = valeurIntervalleZeroUn()*6+1;
 					break;
 
 				case 1:
-					tabIndividu[i].yProb = valeurIntervalleZeroUn();
+					tabIndividu[i].yProb = valeurIntervalleZeroUn()*6+1;
 					break;
 
 				case 2:
-					tabIndividu[i].vitesse = valeurIntervalleZeroUn()*4+1;
+					tabIndividu[i].xVitesse = valeurIntervalleZeroUn()*4+1;
+					break;
+
+				case 3:
+					tabIndividu[i].yVitesse = valeurIntervalleZeroUn()*4+1;
 					break;
 			}
 		}
