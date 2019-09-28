@@ -30,7 +30,32 @@ void cercle(float centreX, float centreY, float rayon) {
 	}
 }
 
-void genereIndividu(individu tabIndividu[10]) {
+void generationIndividu(individu tabIndividu[10]) {
+	// Génération des individus
+	for (int i = 0; i < 10; i++) {
+		tabIndividu[i].panier = 0;
+		tabIndividu[i].total = 0;
+		tabIndividu[i].x = largeurFenetre()/2;
+		tabIndividu[i].y = hauteurFenetre()/2+hauteurFenetre()/16;
+		tabIndividu[i].xProb = valeurIntervalleZeroUn();
+		tabIndividu[i].yProb = valeurIntervalleZeroUn();
+		tabIndividu[i].vitesse = valeurIntervalleZeroUn()*4+1;
+	}
+}
+
+void generationNourriture(nourriture tabNourriture[20]) {
+	// Génération de la nourriture
+	for (int i = 0; i < 20; i++) {
+		tabNourriture[i].x = 0;
+		tabNourriture[i].y = 0;
+		while (tabNourriture[i].x <= 5 || tabNourriture[i].y <= hauteurFenetre()/16+5 || (tabNourriture[i].x >= largeurFenetre()/2-80 && tabNourriture[i].x <= largeurFenetre()/2+80 && tabNourriture[i].y >= hauteurFenetre()/2+hauteurFenetre()/16-80 && tabNourriture[i].y <= hauteurFenetre()/2+hauteurFenetre()/16+80)) {
+			tabNourriture[i].x = valeurAleatoire()*largeurFenetre();
+			tabNourriture[i].y = valeurAleatoire()*hauteurFenetre();
+		}
+	}
+}
+
+void afficheIndividu(individu tabIndividu[10]) {
 	// Affiche les individus
 	char scoreIndividu[100];
 	for (int i = 0; i < 10; i++) {
@@ -39,11 +64,11 @@ void genereIndividu(individu tabIndividu[10]) {
 		couleurCourante(255, 255, 255);
 		epaisseurDeTrait(2);
 		sprintf(scoreIndividu, "%d", tabIndividu[i].total + tabIndividu[i].panier);
-		afficheChaine(scoreIndividu, 10, tabIndividu[i].x-5, tabIndividu[i].y-5);
+		afficheChaine(scoreIndividu, 10, tabIndividu[i].x-tailleChaine(scoreIndividu, 10), tabIndividu[i].y-5);
 	}
 }
 
-void genereNourriture(nourriture tabNourriture[20]) {
+void afficheNourriture(nourriture tabNourriture[20]) {
 	// Affiche la nourriture
 	couleurCourante(0, 125, 0);
 	for (int i = 0; i < 20; i++)
@@ -101,6 +126,51 @@ void acceleration(individu tabIndividu[10], bool accelerate) {
 	}
 }
 
+void selection(individu tabIndividu[10]) {
+	// On ajoute les paniers au score total de chaque indivu
+	for (int i = 0; i < 10; i++) {
+		tabIndividu[i].total += tabIndividu[i].panier;
+		tabIndividu[i].panier = 0;
+	}
+	// Accumule tout les paniers
+	int totalPanier = 0, alea = 0, lastPanier = 0;
+	for (int i = 0; i < 10; i++)
+		totalPanier += tabIndividu[i].total;
+	// On crée nos nouveaux individus
+	individu newIndividu[10];
+	for (int i = 0; i < 10; i++) {
+		lastPanier = 0;
+		alea = valeurIntervalleZeroUn()*totalPanier;
+		for (int j = 0; j < 10; j++) {
+			lastPanier += tabIndividu[j].total;
+			if (alea <= lastPanier) {
+				newIndividu[i] = tabIndividu[j];
+				break;
+			}
+		}
+	}
+	// On réinject les individus avec une possible mutation
+	for (int i = 0; i < 10; i++) {
+		tabIndividu[i] = newIndividu[i];
+		if (valeurIntervalleZeroUn() >= 0.85) {
+			alea = valeurIntervalleZeroUn()*3;
+			switch(alea) {
+				case 0:
+					tabIndividu[i].xProb = valeurIntervalleZeroUn();
+					break;
+
+				case 1:
+					tabIndividu[i].yProb = valeurIntervalleZeroUn();
+					break;
+
+				case 2:
+					tabIndividu[i].vitesse = valeurIntervalleZeroUn()*4+1;
+					break;
+			}
+		}
+	}
+}
+
 int main(int argc, char **argv) {
 	initialiseGfx(argc, argv);
 	prepareFenetreGraphique("Eat Me", LargeurFenetre, HauteurFenetre);
@@ -109,43 +179,30 @@ int main(int argc, char **argv) {
 }
 
 void gestionEvenement(EvenementGfx evenement) {
-	static bool pleinEcran = false;
+	static bool accelerate = false, pleinEcran = false;
 	static individu tabIndividu[10];
 	static nourriture tabNourriture[20];
-	static int score;
-	static char afficheScore[100];
-	static bool accelerate;
+	static int score = 0, evolution = 0;
+	static char afficheScore[100], afficheEvolution[100];
 	
 	switch (evenement) {
 		case Initialisation:
-			score = 0;
-			accelerate = false;
-			for (int i = 0; i < 20; i++) {
-				tabNourriture[i].x = 0;
-				tabNourriture[i].y = 0;
-				while (tabNourriture[i].x <= 5 || tabNourriture[i].y <= hauteurFenetre()/16+5 || (tabNourriture[i].x >= largeurFenetre()/2-80 && tabNourriture[i].x <= largeurFenetre()/2+80 && tabNourriture[i].y >= hauteurFenetre()/2+hauteurFenetre()/16-80 && tabNourriture[i].y <= hauteurFenetre()/2+hauteurFenetre()/16+80)) {
-					tabNourriture[i].x = valeurAleatoire()*largeurFenetre();
-					tabNourriture[i].y = valeurAleatoire()*hauteurFenetre();
-				}
-				if (i < 10) {
-					tabIndividu[i].panier = 0;
-					tabIndividu[i].total = 0;
-					tabIndividu[i].x = largeurFenetre()/2;
-					tabIndividu[i].y = hauteurFenetre()/2+hauteurFenetre()/16;
-					tabIndividu[i].xProb = valeurIntervalleZeroUn();
-					tabIndividu[i].yProb = valeurIntervalleZeroUn();
-					tabIndividu[i].vitesse = valeurIntervalleZeroUn()*4+1;
-				}
-			}
+			generationNourriture(tabNourriture);
+			generationIndividu(tabIndividu);
 			demandeTemporisation(20);
 			break;
 		
 		case Temporisation:
-			//printf("Score: %d\n", score);
 			// Déplacement des individus
 			deplacement(tabIndividu);
 			// Ramassage de la nourriture
 			ramasse(tabIndividu, tabNourriture, &score);
+			// Sélection automatique
+			if (score >= 100) {
+				score = 0;
+				selection(tabIndividu);
+				evolution += 1;
+			}
 			rafraichisFenetre();
 			break;
 			
@@ -155,10 +212,10 @@ void gestionEvenement(EvenementGfx evenement) {
 			// Affichage de la maison
 			couleurCourante(215, 0, 0);
 			cercle(largeurFenetre()/2, hauteurFenetre()/2+hauteurFenetre()/16, 75);
-			// Génération des individus
-			genereIndividu(tabIndividu);
-			// Génération de la nourriture
-			genereNourriture(tabNourriture);
+			// Affichage des individus
+			afficheIndividu(tabIndividu);
+			// Affichage de la nourriture
+			afficheNourriture(tabNourriture);
 			// Traçage d'un rectangle blanc
 			couleurCourante(255, 255, 255);
 			rectangle(0, 0, largeurFenetre(), hauteurFenetre()/16);
@@ -171,7 +228,8 @@ void gestionEvenement(EvenementGfx evenement) {
 			epaisseurDeTrait(2);
 			sprintf(afficheScore, "Score: %d", score);
 			afficheChaine(afficheScore, hauteurFenetre()/32, 7*largeurFenetre()/8, hauteurFenetre()/64);
-			afficheChaine("Appuyez sur 'M' ou 'm' pour une mutation.", hauteurFenetre()/32, largeurFenetre()/128, hauteurFenetre()/64);
+			sprintf(afficheEvolution, "Evolution n.%d", evolution);
+			afficheChaine(afficheEvolution, hauteurFenetre()/32, largeurFenetre()/128, hauteurFenetre()/64);
 			break;
 			
 		case Clavier:
@@ -195,14 +253,7 @@ void gestionEvenement(EvenementGfx evenement) {
 					else
 						redimensionneFenetre(LargeurFenetre, HauteurFenetre);
 					// Génération de la nourriture
-					for (int i = 0; i < 20; i++) {
-						tabNourriture[i].x = 0;
-						tabNourriture[i].y = 0;
-						while (tabNourriture[i].x <= 5 || tabNourriture[i].y <= hauteurFenetre()/16+5 || (tabNourriture[i].x >= largeurFenetre()/2-80 && tabNourriture[i].x <= largeurFenetre()/2+80 && tabNourriture[i].y >= hauteurFenetre()/2+hauteurFenetre()/16-80 && tabNourriture[i].y <= hauteurFenetre()/2+hauteurFenetre()/16+80)) {
-							tabNourriture[i].x = valeurAleatoire()*largeurFenetre();
-							tabNourriture[i].y = valeurAleatoire()*hauteurFenetre();
-						}
-					}
+					generationNourriture(tabNourriture);
 					break;
 
 				case 'C':
@@ -231,14 +282,7 @@ void gestionEvenement(EvenementGfx evenement) {
 		
 		case Redimensionnement:
 			// Génération de la nourriture
-			for (int i = 0; i < 20; i++) {
-				tabNourriture[i].x = 0;
-				tabNourriture[i].y = 0;
-				while (tabNourriture[i].x <= 5 || tabNourriture[i].y <= hauteurFenetre()/16+5 || (tabNourriture[i].x >= largeurFenetre()/2-80 && tabNourriture[i].x <= largeurFenetre()/2+80 && tabNourriture[i].y >= hauteurFenetre()/2+hauteurFenetre()/16-80 && tabNourriture[i].y <= hauteurFenetre()/2+hauteurFenetre()/16+80)) {
-					tabNourriture[i].x = valeurAleatoire()*largeurFenetre();
-					tabNourriture[i].y = valeurAleatoire()*hauteurFenetre();
-				}
-			}
+			generationNourriture(tabNourriture);
 			break;
 	}
 }
