@@ -14,6 +14,7 @@ typedef struct individu {
 	float x, y;
 	int panier;
 	int total;
+	int last;
 } individu;
 
 typedef struct nourriture {
@@ -35,6 +36,7 @@ void generationIndividu(individu tabIndividu[10]) {
 	for (int i = 0; i < 10; i++) {
 		tabIndividu[i].panier = 0;
 		tabIndividu[i].total = 0;
+		tabIndividu[i].last = -1;
 		// Démarrage au centre de la maison
 		tabIndividu[i].x = largeurFenetre()/2;
 		tabIndividu[i].y = hauteurFenetre()/2+hauteurFenetre()/16;
@@ -48,16 +50,38 @@ void generationIndividu(individu tabIndividu[10]) {
 	}
 }
 
+void checkNourriture(nourriture tabNourriture[20]) {
+	// Vérifie que la nourriture ne soit pas trop proche
+	bool indice = false;
+	for (int i = 0; i < 20; i++) {
+		for (int j = 0; j < 20; j++) {
+			if (i != j) {
+				while (tabNourriture[i].x <= 5 || tabNourriture[i].y <= hauteurFenetre()/16+5 || (tabNourriture[i].x >= largeurFenetre()/2-150 && tabNourriture[i].x <= largeurFenetre()/2+150 && tabNourriture[i].y >= hauteurFenetre()/2+hauteurFenetre()/16-150 && tabNourriture[i].y <= hauteurFenetre()/2+hauteurFenetre()/16+150) || (tabNourriture[i].x >= tabNourriture[j].x-100 && tabNourriture[i].x <= tabNourriture[j].x+100 && tabNourriture[i].y >= tabNourriture[j].y-100 && tabNourriture[i].y <= tabNourriture[j].y+100)) {
+					indice = true;
+					tabNourriture[i].x = valeurAleatoire()*largeurFenetre();
+					tabNourriture[i].y = valeurAleatoire()*hauteurFenetre();
+				}
+				if (indice) {
+					indice = false;
+					i = 0;
+					j = 0;
+				}
+			}
+		}
+	}
+}
+
 void generationNourriture(nourriture tabNourriture[20]) {
 	// Génération de la nourriture aléatoirement sur le terrain
 	for (int i = 0; i < 20; i++) {
 		tabNourriture[i].x = 0;
 		tabNourriture[i].y = 0;
-		while (tabNourriture[i].x <= 5 || tabNourriture[i].y <= hauteurFenetre()/16+5 || (tabNourriture[i].x >= largeurFenetre()/2-80 && tabNourriture[i].x <= largeurFenetre()/2+80 && tabNourriture[i].y >= hauteurFenetre()/2+hauteurFenetre()/16-80 && tabNourriture[i].y <= hauteurFenetre()/2+hauteurFenetre()/16+80)) {
+		while (tabNourriture[i].x <= 5 || tabNourriture[i].y <= hauteurFenetre()/16+5 || (tabNourriture[i].x >= largeurFenetre()/2-150 && tabNourriture[i].x <= largeurFenetre()/2+150 && tabNourriture[i].y >= hauteurFenetre()/2+hauteurFenetre()/16-150 && tabNourriture[i].y <= hauteurFenetre()/2+hauteurFenetre()/16+150)) {
 			tabNourriture[i].x = valeurAleatoire()*largeurFenetre();
 			tabNourriture[i].y = valeurAleatoire()*hauteurFenetre();
 		}
 	}
+	checkNourriture(tabNourriture);
 }
 
 void afficheIndividu(individu tabIndividu[10]) {
@@ -107,15 +131,10 @@ void ramasse(individu tabIndividu[10], nourriture tabNourriture[20], int *score)
 		if (tabIndividu[i].panier < 5) {
 			for (int j = 0; j < 20; j++) {
 				// Lorqu'un individu rentre en collision avec de la nourriture il l'a ramasse et une nouvelle nourriture est générée
-				if (tabIndividu[i].x >= tabNourriture[j].x-20 && tabIndividu[i].x <= tabNourriture[j].x+20 && tabIndividu[i].y >= tabNourriture[j].y-20 && tabIndividu[i].y <= tabNourriture[j].y+20) {
+				if (tabIndividu[i].last != j && tabIndividu[i].x >= tabNourriture[j].x-20 && tabIndividu[i].x <= tabNourriture[j].x+20 && tabIndividu[i].y >= tabNourriture[j].y-20 && tabIndividu[i].y <= tabNourriture[j].y+20) {
 					tabIndividu[i].panier += 1;
+					tabIndividu[i].last = j;
 					*score += 1;
-					tabNourriture[j].x = 0;
-					tabNourriture[j].y = 0;
-					while (tabNourriture[j].x <= 5 || tabNourriture[j].y <= hauteurFenetre()/16+5 || (tabNourriture[j].x >= largeurFenetre()/2-80 && tabNourriture[j].x <= largeurFenetre()/2+80 && tabNourriture[j].y >= hauteurFenetre()/2+hauteurFenetre()/16-80 && tabNourriture[j].y <= hauteurFenetre()/2+hauteurFenetre()/16+80)) {
-						tabNourriture[j].x = valeurAleatoire()*largeurFenetre();
-						tabNourriture[j].y = valeurAleatoire()*hauteurFenetre();
-					}
 				}
 			}
 		}
@@ -123,6 +142,7 @@ void ramasse(individu tabIndividu[10], nourriture tabNourriture[20], int *score)
 		if (tabIndividu[i].x >= largeurFenetre()/2-90 && tabIndividu[i].x <= largeurFenetre()/2+90 && tabIndividu[i].y >= hauteurFenetre()/2+hauteurFenetre()/16-90 && tabIndividu[i].y <= hauteurFenetre()/2+hauteurFenetre()/16+90) {
 			tabIndividu[i].total += tabIndividu[i].panier;
 			tabIndividu[i].panier = 0;
+			tabIndividu[i].last = 0;
 		}
 	}
 }
@@ -328,6 +348,7 @@ void transformation(individu tabIndividu[10]) {
 	individu newIndividu[5];
 	for (int i = 0; i < 5; i++) {
 		newIndividu[i].panier = 0;
+		newIndividu[i].last = -1;
 		newIndividu[i].total = (paireIndividu[i][0].total+paireIndividu[i][1].total)/2;
 		newIndividu[i].x = (paireIndividu[i][0].x+paireIndividu[i][1].x)/2;
 		newIndividu[i].y = (paireIndividu[i][0].y+paireIndividu[i][1].y)/2;
@@ -347,6 +368,8 @@ void transformation(individu tabIndividu[10]) {
 	}
 	for (int i = 0; i < 5; i++)
 		tabIndividu[i+5] = newIndividu[i];
+	for (int i = 0; i < 10; i++)
+		tabIndividu[i].total = 0;
 }
 // Fin de l'évolution n°3
 
