@@ -161,7 +161,7 @@ void acceleration(individu tabIndividu[10], bool accelerate) {
 }
 
 // Version de l'évolution n°1
-/*void transformation(individu tabIndividu[10]) {
+void transformation(individu tabIndividu[10]) {
 	// On ajoute les paniers au score total de chaque indivu
 	for (int i = 0; i < 10; i++) {
 		tabIndividu[i].total += tabIndividu[i].panier;
@@ -191,11 +191,11 @@ void acceleration(individu tabIndividu[10], bool accelerate) {
 			alea = valeurIntervalleZeroUn()*4;
 			switch(alea) {
 				case 0:
-					tabIndividu[i].xProb = valeurIntervalleZeroUn()*6+1;
+					tabIndividu[i].xProb = valeurIntervalleZeroUn()*5+1;
 					break;
 
 				case 1:
-					tabIndividu[i].yProb = valeurIntervalleZeroUn()*6+1;
+					tabIndividu[i].yProb = valeurIntervalleZeroUn()*5+1;
 					break;
 
 				case 2:
@@ -208,7 +208,7 @@ void acceleration(individu tabIndividu[10], bool accelerate) {
 			}
 		}
 	}
-}*/
+}
 // Fin de l'évolution n°1
 
 // Version de l'évolution n°2
@@ -296,7 +296,7 @@ void transformation(individu tabIndividu[10]) {
 // Fin de l'évolution n°2
 
 // Version de l'évolution n°3
-bool compareIndividu(individu fIndividu, individu sIndividu) {
+/*bool compareIndividu(individu fIndividu, individu sIndividu) {
 	if (fIndividu.xVitesse == sIndividu.xVitesse && fIndividu.yVitesse == sIndividu.yVitesse
 			&& fIndividu.xProb == sIndividu.xProb && fIndividu.yProb == sIndividu.yProb
 			&& fIndividu.x == sIndividu.x && fIndividu.y == sIndividu.y
@@ -370,7 +370,7 @@ void transformation(individu tabIndividu[10]) {
 		tabIndividu[i+5] = newIndividu[i];
 	for (int i = 0; i < 10; i++)
 		tabIndividu[i].total = 0;
-}
+}*/
 // Fin de l'évolution n°3
 
 int main(int argc, char **argv) {
