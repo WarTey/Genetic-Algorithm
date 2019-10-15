@@ -42,7 +42,7 @@ void generationIndividu(individu tabIndividu[10]) {
 }
 
 void checkNourriture(nourriture tabNourriture[20]) {
-	// Vérifie que la nourriture ne soit pas trop proche
+	// Vérifie que les paniers ne soient pas trop proches
 	bool indice = false;
 	for (int i = 0; i < 20; i++) {
 		for (int j = 0; j < 20; j++) {
@@ -63,7 +63,7 @@ void checkNourriture(nourriture tabNourriture[20]) {
 }
 
 void generationNourriture(nourriture tabNourriture[20]) {
-	// Génération de la nourriture aléatoirement sur le terrain
+	// Génération de la nourriture sur le terrain
 	for (int i = 0; i < 20; i++) {
 		tabNourriture[i].x = 0;
 		tabNourriture[i].y = 0;
@@ -121,17 +121,17 @@ void ramasse(individu tabIndividu[10], nourriture tabNourriture[20], int *score)
 		// Un individu peut seulement porter 5 paniers
 		if (tabIndividu[i].panier < 5) {
 			for (int j = 0; j < 20; j++) {
-				// Lorqu'un individu rentre en collision avec de la nourriture il l'a ramasse et une nouvelle nourriture est générée
+				// Lorqu'un individu rentre en collision avec de la nourriture il l'a ramasse
 				if (tabIndividu[i].last != j && tabIndividu[i].x >= tabNourriture[j].x-20 && tabIndividu[i].x <= tabNourriture[j].x+20 && tabIndividu[i].y >= tabNourriture[j].y-20 && tabIndividu[i].y <= tabNourriture[j].y+20) {
 					tabIndividu[i].panier += 1;
 					tabIndividu[i].last = j;
-					*score += 1;
 				}
 			}
 		}
-		// Lorqu'un individu rentre à la maison il dépose ses paniers
+		// Lorqu'un individu rentre à la maison, il dépose ses paniers et incrémente le score général
 		if (tabIndividu[i].x >= largeurFenetre()/2-90 && tabIndividu[i].x <= largeurFenetre()/2+90 && tabIndividu[i].y >= hauteurFenetre()/2+hauteurFenetre()/16-90 && tabIndividu[i].y <= hauteurFenetre()/2+hauteurFenetre()/16+90) {
 			tabIndividu[i].total += tabIndividu[i].panier;
+			*score += tabIndividu[i].panier;
 			tabIndividu[i].panier = 0;
 			tabIndividu[i].last = 0;
 		}
@@ -203,7 +203,7 @@ void gestionEvenement(EvenementGfx evenement) {
 			couleurCourante(0, 0, 0);
 			epaisseurDeTrait(2);
 			ligne(0, hauteurFenetre()/16, largeurFenetre(), hauteurFenetre()/16);
-			// Affiche d'une chapine de caractère à l'écran
+			// Affiche d'une chaîne de caractères à l'écran
 			couleurCourante(0, 0, 0);
 			epaisseurDeTrait(2);
 			sprintf(afficheScore, "Score: %d", score);

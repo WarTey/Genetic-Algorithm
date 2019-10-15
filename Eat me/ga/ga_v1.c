@@ -8,7 +8,7 @@ void transformation(individu tabIndividu[10]) {
 		tabIndividu[i].total += tabIndividu[i].panier;
 		tabIndividu[i].panier = 0;
 	}
-	// Accumule tout les paniers
+	// Accumule tous les paniers
 	int totalPanier = 0, alea = 0, lastPanier = 0;
 	for (int i = 0; i < 10; i++)
 		totalPanier += tabIndividu[i].total;
@@ -29,7 +29,7 @@ void transformation(individu tabIndividu[10]) {
 	for (int i = 0; i < 10; i++) {
 		tabIndividu[i] = newIndividu[i];
 		tabIndividu[i].total = 0;
-		if (valeurIntervalleZeroUn() >= 0.85) {
+		if (valeurIntervalleZeroUn() >= 0.90) {
 			alea = valeurIntervalleZeroUn()*4;
 			switch(alea) {
 				case 0:

@@ -3,6 +3,7 @@
 #include "../lib/ESLib.h"
 #include "ga.h"
 
+// Compare deux individus (structure)
 bool compareIndividu(individu fIndividu, individu sIndividu) {
 	if (fIndividu.xVitesse == sIndividu.xVitesse && fIndividu.yVitesse == sIndividu.yVitesse
 			&& fIndividu.xProb == sIndividu.xProb && fIndividu.yProb == sIndividu.yProb
@@ -13,17 +14,20 @@ bool compareIndividu(individu fIndividu, individu sIndividu) {
 }
 
 individu selectionIndividus(individu tabIndividu[10]) {
-	// Sélection de deux individus
+	// Sélection de deux individus par tournoi
 	int fAlea = valeurIntervalleZeroUn()*10, sAlea = valeurIntervalleZeroUn()*10;
 	individu fIndividu = tabIndividu[fAlea];
 	individu sIndividu = tabIndividu[sAlea];
+	// Garde l'individu avec le score le plus élevé
 	return fIndividu.total > sIndividu.total ? fIndividu : sIndividu;
 }
 
+// Crée des paires d'individus
 void paire(individu tabIndividu[10], individu paireIndividu[5][2]) {
 	for (int i = 0; i < 5; i++) {
 		individu fIndividu = selectionIndividus(tabIndividu);
 		individu sIndividu = selectionIndividus(tabIndividu);
+		// Recherche un autre individu tant qu'il est similaire au premier
 		while (compareIndividu(fIndividu, sIndividu))
 			sIndividu = selectionIndividus(tabIndividu);
 		paireIndividu[i][0] = fIndividu;
@@ -32,7 +36,7 @@ void paire(individu tabIndividu[10], individu paireIndividu[5][2]) {
 }
 
 void crossover(float *newIndividu, float fParam, float sParam, int cMin, int cMax) {
-	// Crossover de la caractéristique
+	// Crossover du gène
 	int min = fParam < sParam ? fParam : sParam;
 	int max = fParam > sParam ? fParam : sParam;
 	*newIndividu = valeurIntervalleZeroUn()*(max-min)+min;
@@ -61,6 +65,7 @@ void transformation(individu tabIndividu[10]) {
 	// On crée 5 nouveaux individus
 	individu newIndividu[5];
 	for (int i = 0; i < 5; i++) {
+		// Applique un crossover sur chaque gène
 		newIndividu[i].panier = 0;
 		int min = paireIndividu[i][0].total < paireIndividu[i][1].total ? paireIndividu[i][0].total : paireIndividu[i][1].total;
 		int max = paireIndividu[i][0].total > paireIndividu[i][1].total ? paireIndividu[i][0].total : paireIndividu[i][1].total;
@@ -72,6 +77,7 @@ void transformation(individu tabIndividu[10]) {
 		crossover(&(newIndividu[i].xVitesse), paireIndividu[i][0].xVitesse, paireIndividu[i][1].xVitesse, 1, 5);
 		crossover(&(newIndividu[i].yVitesse), paireIndividu[i][0].yVitesse, paireIndividu[i][1].yVitesse, 1, 5);
 	}
+	// Tri nos individus
 	for (int i = 0; i < 9; i++) {
 		for (int j = i+1; j < 10; j++) {
 			if (tabIndividu[i].total < tabIndividu[j].total) {
@@ -81,6 +87,7 @@ void transformation(individu tabIndividu[10]) {
 			}
 		}
 	}
+	// Remplace nos individus les plus faibles par les nouveaux
 	for (int i = 0; i < 5; i++)
 		tabIndividu[i+5] = newIndividu[i];
 	for (int i = 0; i < 10; i++)
