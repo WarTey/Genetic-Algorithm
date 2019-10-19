@@ -1,5 +1,5 @@
 main: main.o ga/ga.o libisentlib.a
-#	gcc -Wall main.o -o main libisentlib.a -lm -lglut -lGL -lX11
+#	gcc -Wall main.o ga/ga.o -o main libisentlib.a -lm -lglut -lGL -lX11
 # Sous MacOSX, commenter la ligne de commande ci-dessus (en mettant un # au debut)
 # et de-commenter la ligne de commande ci-apres :
 	gcc -Wall main.o ga/ga.o -o main libisentlib.a -lm -framework OpenGL -framework GLUT
