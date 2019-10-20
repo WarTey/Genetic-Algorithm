@@ -79,7 +79,7 @@ void afficheVille(ville tabVille[10]) {
 
 int main(int argc, char **argv) {
 	initialiseGfx(argc, argv);
-	prepareFenetreGraphique("Eat Me", LargeurFenetre, HauteurFenetre);
+	prepareFenetreGraphique("Travelling salesman problem", LargeurFenetre, HauteurFenetre);
 	lanceBoucleEvenements();
 	return 0;
 }
