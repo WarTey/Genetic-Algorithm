@@ -7,10 +7,6 @@
 #define LargeurFenetre 1200
 #define HauteurFenetre 720
 
-typedef struct ville {
-	float x, y;
-} ville;
-
 void cercle(float centreX, float centreY, float rayon) {
 	const int Pas = 180;
 	const double PasAngulaire = 2.*M_PI/Pas;
@@ -99,6 +95,8 @@ void gestionEvenement(EvenementGfx evenement) {
 		case Initialisation:
 			generationVille(tabVille);
 			generationIndividu(tabIndividu);
+			fitness(tabIndividu, tabVille);
+			afficheGeneration(tabIndividu, evolution);
 			demandeTemporisation(20);
 			break;
 		
