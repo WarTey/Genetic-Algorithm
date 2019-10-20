@@ -98,3 +98,22 @@ void crossover(individu tabIndividu[10]) {
         tabIndividu[index] = newIndividu[k];
     }
 }
+
+// Applique une mutation sur la nouvelle population
+void mutation(individu tabIndividu[10]) {
+    for (int i = 0; i < 10; i++) {
+        // Une mutation à 10% de chance de s'appliquer
+        if (valeurIntervalleZeroUn() <= 0.1) {
+            // Choisis un chemin aléatoire et une position aléatoire
+            int chemin = valeurIntervalleZeroUn()*10;
+            int index = valeurIntervalleZeroUn()*10;
+            for (int j = 0; j < 10; j++) {
+                if (tabIndividu[i].chemin[j] == chemin) {
+                    int temp = tabIndividu[i].chemin[j];
+                    tabIndividu[i].chemin[j] = tabIndividu[i].chemin[index];
+                    tabIndividu[i].chemin[index] = chemin;
+                }
+            }
+        }
+    }
+}
