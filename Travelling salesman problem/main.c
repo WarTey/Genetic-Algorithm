@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <math.h>
+#include <unistd.h>
 #include "lib/GfxLib.h"
 #include "lib/ESLib.h"
 #include "ga/ga.h"
@@ -77,6 +78,18 @@ void afficheVille(ville tabVille[10]) {
 		rectangle(tabVille[i].x-5, tabVille[i].y-5, tabVille[i].x+5, tabVille[i].y+5);
 }
 
+void afficheChemin(individu tabIndividu[10], ville tabVille[10]) {
+	int index = 0;
+	for (int i = 1; i < 10; i++)
+		if (tabIndividu[index].fitness > tabIndividu[i].fitness)
+			index = i;
+	couleurCourante(125, 0, 0);
+	epaisseurDeTrait(2);
+	for (int i = 1; i < 10; i++)
+		ligne(tabVille[tabIndividu[index].chemin[i-1]].x, tabVille[tabIndividu[index].chemin[i-1]].y, tabVille[tabIndividu[index].chemin[i]].x, tabVille[tabIndividu[index].chemin[i]].y);
+	ligne(tabVille[tabIndividu[index].chemin[0]].x, tabVille[tabIndividu[index].chemin[0]].y, tabVille[tabIndividu[index].chemin[9]].x, tabVille[tabIndividu[index].chemin[9]].y);
+}
+
 int main(int argc, char **argv) {
 	initialiseGfx(argc, argv);
 	prepareFenetreGraphique("Travelling salesman problem", LargeurFenetre, HauteurFenetre);
@@ -95,12 +108,23 @@ void gestionEvenement(EvenementGfx evenement) {
 		case Initialisation:
 			generationVille(tabVille);
 			generationIndividu(tabIndividu);
+			// Calcul la distance des individus
 			fitness(tabIndividu, tabVille);
+			// Affiche la population de départ
 			afficheGeneration(tabIndividu, evolution);
 			demandeTemporisation(20);
 			break;
 		
 		case Temporisation:
+			if (evolution < 2500) {
+				// Augmente la génération actuelle
+				evolution += 1;
+				// Processus d'évolution (voir les commentaires des fonctions correspondantes)
+				crossover(tabIndividu);
+				mutation(tabIndividu);
+				fitness(tabIndividu, tabVille);
+				afficheGeneration(tabIndividu, evolution);
+			}
 			rafraichisFenetre();
 			break;
 			
@@ -109,6 +133,8 @@ void gestionEvenement(EvenementGfx evenement) {
 			effaceFenetre (255, 255, 255);
 			// Affichage des villes
 			afficheVille(tabVille);
+			// Affichage du meilleur chemin
+			afficheChemin(tabIndividu, tabVille);
 			// Traçage d'un rectangle blanc
 			couleurCourante(255, 255, 255);
 			rectangle(0, 0, largeurFenetre(), hauteurFenetre()/16);
