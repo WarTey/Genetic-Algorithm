@@ -30,9 +30,9 @@ void afficheGeneration(individu tabIndividu[10], int generation) {
 }
 
 // Tirage au sort sur une roue biaisée
-void frise(individu tabIndividu[10], individu *paireIndividu, int total) {
+void frise(individu tabIndividu[10], individu *paireIndividu, float total) {
     // Affectation de la valeur aléatoire
-    int alea = valeurIntervalleZeroUn()*total, old = 0;
+    float alea = valeurIntervalleZeroUn()*total, old = 0;
     for (int j = 0; j < 10; j++) {
         // Copie la distance de l'individu actuel
         old += 1/tabIndividu[j].fitness;
@@ -46,64 +46,70 @@ void frise(individu tabIndividu[10], individu *paireIndividu, int total) {
 }
 
 // Crée des paires d'individus pour le crossover
-void paire(individu tabIndividu[10], individu paireIndividu[5][2]) {
+void paire(individu tabIndividu[10], individu paireIndividu[9][2]) {
     float total = 0;
     for (int i = 0; i < 10; i++)
         total += 1/tabIndividu[i].fitness;
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 9; i++) {
         frise(tabIndividu, &(paireIndividu[i][0]), total);
         frise(tabIndividu, &(paireIndividu[i][1]), total);
     }
 }
 
 // Définit notre nouvel individu
-void create(individu newIndividu[5], individu paireIndividu[5][2], int indice) {
+void create(individu newIndividu[9], individu paireIndividu[9][2], int indice) {
     // Détermine la valeur aléatoire qui permettra de sélection un certain pourcentage de chaque individu
     int prop = valeurIntervalleZeroUn()*10;
     // Remplis notre nouvel individu en fonction de la valeur aléatoire précédente
     for (int i = 0; i < prop; i++)
         newIndividu[indice].chemin[i] = paireIndividu[indice][0].chemin[i];
-    // Modifie le tableau des chemins pour éviter les doublons
-    for (int i = 0; i < prop; i++) {
-        for (int j = i+1; j < 10; j++) {
-            if (paireIndividu[indice][0].chemin[i] == paireIndividu[indice][1].chemin[j]) {
-                int temp = paireIndividu[indice][1].chemin[j];
-                paireIndividu[indice][1].chemin[j] = paireIndividu[indice][1].chemin[i];
-                paireIndividu[indice][1].chemin[i] = temp;
-                break;
+
+    for (int i = 0; i < 10; i++) {
+        if (prop < 10) {
+            int temoin = true;
+            for (int j = 0; j < prop; j++) {
+                if (paireIndividu[indice][1].chemin[i] == newIndividu[indice].chemin[j]) {
+                    temoin = false;
+                    break;
+                }
+            }
+            if (temoin) {
+                newIndividu[indice].chemin[prop] = paireIndividu[indice][1].chemin[i];
+                prop += 1;
             }
         }
     }
-    // Copie le reste du chemin
-    for (int i = prop; i < 10; i++)
-        newIndividu[indice].chemin[i] = paireIndividu[indice][1].chemin[i];
 }
 
 // Applique un crossover sur notre population
 void crossover(individu tabIndividu[10]) {
-    individu paireIndividu[5][2];
-    individu newIndividu[5];
-    // Détermine 5 paires d'individus
+    individu paireIndividu[9][2];
+    individu newIndividu[9];
+    // Détermine 10 paires d'individus
     paire(tabIndividu, paireIndividu);
-    // Initialise 5 nouveaux individus en fonction des paires précédentes
-    for (int i = 0; i < 5; i++)
+    // Initialise 10 nouveaux individus en fonction des paires précédentes
+    for (int i = 0; i < 9; i++)
         create(newIndividu, paireIndividu, i);
+    // Détermine l'individu avec la distance la plus courte
+    int top = 0;
+    for (int i = 1; i < 10; i++)
+        if (tabIndividu[top].fitness > tabIndividu[i].fitness)
+            top = i;
+    // Remplace les individus par les nouveaux
     int index = 0;
-    // Remplace les individus avec la distance la plus haute par les nouveaux individus
-    for (int k = 0; k < 5; k++) {
-        index = 0;
-        for (int i = 1; i < 10; i++)
-            if (tabIndividu[index].fitness < tabIndividu[i].fitness)
-                index = i;
+    for (int k = 0; k < 9; k++) {
+        if (index == top)
+            index += 1;
         tabIndividu[index] = newIndividu[k];
+        index += 1;
     }
 }
 
 // Applique une mutation sur la nouvelle population
 void mutation(individu tabIndividu[10]) {
     for (int i = 0; i < 10; i++) {
-        // Une mutation à 10% de chance de s'appliquer
-        if (valeurIntervalleZeroUn() <= 0.1) {
+        // Une mutation à 1% de chance de s'appliquer
+        if (valeurIntervalleZeroUn() <= 0.01) {
             // Choisis un chemin aléatoire et une position aléatoire
             int chemin = valeurIntervalleZeroUn()*10;
             int index = valeurIntervalleZeroUn()*10;

@@ -78,7 +78,7 @@ void afficheVille(ville tabVille[10]) {
 		rectangle(tabVille[i].x-5, tabVille[i].y-5, tabVille[i].x+5, tabVille[i].y+5);
 }
 
-void afficheChemin(individu tabIndividu[10], ville tabVille[10]) {
+void afficheChemin(individu tabIndividu[10], ville tabVille[10], float *distance) {
 	int index = 0;
 	for (int i = 1; i < 10; i++)
 		if (tabIndividu[index].fitness > tabIndividu[i].fitness)
@@ -88,6 +88,7 @@ void afficheChemin(individu tabIndividu[10], ville tabVille[10]) {
 	for (int i = 1; i < 10; i++)
 		ligne(tabVille[tabIndividu[index].chemin[i-1]].x, tabVille[tabIndividu[index].chemin[i-1]].y, tabVille[tabIndividu[index].chemin[i]].x, tabVille[tabIndividu[index].chemin[i]].y);
 	ligne(tabVille[tabIndividu[index].chemin[0]].x, tabVille[tabIndividu[index].chemin[0]].y, tabVille[tabIndividu[index].chemin[9]].x, tabVille[tabIndividu[index].chemin[9]].y);
+	*distance = tabIndividu[index].fitness;
 }
 
 int main(int argc, char **argv) {
@@ -101,7 +102,8 @@ void gestionEvenement(EvenementGfx evenement) {
 	static bool pleinEcran = false;
 	static individu tabIndividu[10];
 	static ville tabVille[10];
-	static int distance = 0, evolution = 0;
+	static int evolution = 0;
+	static float distance = 0;
 	static char afficheDistance[100], afficheEvolution[100];
 	
 	switch (evenement) {
@@ -116,7 +118,7 @@ void gestionEvenement(EvenementGfx evenement) {
 			break;
 		
 		case Temporisation:
-			if (evolution < 2500) {
+			if (evolution < 500) {
 				// Augmente la génération actuelle
 				evolution += 1;
 				// Processus d'évolution (voir les commentaires des fonctions correspondantes)
@@ -134,7 +136,7 @@ void gestionEvenement(EvenementGfx evenement) {
 			// Affichage des villes
 			afficheVille(tabVille);
 			// Affichage du meilleur chemin
-			afficheChemin(tabIndividu, tabVille);
+			afficheChemin(tabIndividu, tabVille, &distance);
 			// Traçage d'un rectangle blanc
 			couleurCourante(255, 255, 255);
 			rectangle(0, 0, largeurFenetre(), hauteurFenetre()/16);
@@ -145,7 +147,7 @@ void gestionEvenement(EvenementGfx evenement) {
 			// Affiche d'une chaîne de caractères à l'écran
 			couleurCourante(0, 0, 0);
 			epaisseurDeTrait(2);
-			sprintf(afficheDistance, "Distance: %d", distance);
+			sprintf(afficheDistance, "Distance: %f", distance);
 			afficheChaine(afficheDistance, hauteurFenetre()/32, largeurFenetre()/2, hauteurFenetre()/64);
 			sprintf(afficheEvolution, "Evolution n.%d", evolution);
 			afficheChaine(afficheEvolution, hauteurFenetre()/32, largeurFenetre()/128, hauteurFenetre()/64);
