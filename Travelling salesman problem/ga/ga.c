@@ -18,7 +18,7 @@ void fitness(individu tabIndividu[10], ville tabVille[10]) {
     }
 }
 
-// Affiche dans le terminal la population actuelle
+// Affiche, dans le terminal, la population actuelle
 void afficheGeneration(individu tabIndividu[10], int generation) {
     printf("Génération: %d\n", generation);
     for (int i = 0; i < 10; i++) {
@@ -37,7 +37,7 @@ void frise(individu tabIndividu[10], individu *paireIndividu, float total) {
         // Copie la distance de l'individu actuel
         old += 1/tabIndividu[j].fitness;
         if (alea <= old) {
-            // Dans le cas où la valeur aléatoire est inférieure ou égale au score actuel on copie ces chemins
+            // Dans le cas où la valeur aléatoire est inférieure ou égale au score actuel, on garde ces chemins
             for (int i = 0; i < 10; i++)
                 paireIndividu->chemin[i] = tabIndividu[j].chemin[i];
             break;
@@ -45,9 +45,11 @@ void frise(individu tabIndividu[10], individu *paireIndividu, float total) {
     }
 }
 
-// Crée des paires d'individus pour le crossover
+// Met en place des paires d'individus pour le crossover
 void paire(individu tabIndividu[10], individu paireIndividu[9][2]) {
     float total = 0;
+    // Détermine le score total mais inversé pour que les villes avec la distance la plus courte
+    // est plus de chance d'être sélectionnées
     for (int i = 0; i < 10; i++)
         total += 1/tabIndividu[i].fitness;
     for (int i = 0; i < 9; i++) {
@@ -60,19 +62,21 @@ void paire(individu tabIndividu[10], individu paireIndividu[9][2]) {
 void create(individu newIndividu[9], individu paireIndividu[9][2], int indice) {
     // Détermine la valeur aléatoire qui permettra de sélection un certain pourcentage de chaque individu
     int prop = valeurIntervalleZeroUn()*10;
-    // Remplis notre nouvel individu en fonction de la valeur aléatoire précédente
+    // Remplit notre nouvel individu en fonction de la valeur aléatoire précédente (avec la paire 1)
     for (int i = 0; i < prop; i++)
         newIndividu[indice].chemin[i] = paireIndividu[indice][0].chemin[i];
-
+    // Le reste du tableau correspond au chemin de l'autre individu (paire 2) mais qui ne sont pas déjà présent
     for (int i = 0; i < 10; i++) {
         if (prop < 10) {
             int temoin = true;
+            // Détermine si la valeure est déjà présente ou non
             for (int j = 0; j < prop; j++) {
                 if (paireIndividu[indice][1].chemin[i] == newIndividu[indice].chemin[j]) {
                     temoin = false;
                     break;
                 }
             }
+            // Si elle ne l'est pas, alors l'ajoute
             if (temoin) {
                 newIndividu[indice].chemin[prop] = paireIndividu[indice][1].chemin[i];
                 prop += 1;
@@ -85,9 +89,9 @@ void create(individu newIndividu[9], individu paireIndividu[9][2], int indice) {
 void crossover(individu tabIndividu[10]) {
     individu paireIndividu[9][2];
     individu newIndividu[9];
-    // Détermine 10 paires d'individus
+    // Détermine 9 paires d'individus
     paire(tabIndividu, paireIndividu);
-    // Initialise 10 nouveaux individus en fonction des paires précédentes
+    // Initialise 9 nouveaux individus en fonction des paires précédentes
     for (int i = 0; i < 9; i++)
         create(newIndividu, paireIndividu, i);
     // Détermine l'individu avec la distance la plus courte
@@ -95,7 +99,7 @@ void crossover(individu tabIndividu[10]) {
     for (int i = 1; i < 10; i++)
         if (tabIndividu[top].fitness > tabIndividu[i].fitness)
             top = i;
-    // Remplace les individus par les nouveaux
+    // Remplace les individus par les nouveaux (sauf celui avec la plus petite distance)
     int index = 0;
     for (int k = 0; k < 9; k++) {
         if (index == top)

@@ -21,6 +21,7 @@ void cercle(float centreX, float centreY, float rayon) {
 void generationIndividu(individu tabIndividu[10]) {
 	// Génération des individus
 	int ville = 0;
+	// Définit la distance de chaque individu à 0
 	for (int i = 0; i < 10; i++) {
 		tabIndividu[i].fitness = 0;
 		// Répartition des chemins
@@ -38,11 +39,12 @@ void generationIndividu(individu tabIndividu[10]) {
 }
 
 void checkVille(ville tabVille[10]) {
-	// Vérifie que les villes ne soient pas trop proches
+	// Repositionne une ville en cas de mauvais placement
 	bool indice = false;
 	for (int i = 0; i < 10; i++) {
 		for (int j = 0; j < 10; j++) {
 			if (i != j) {
+				// Vérifie qu'une ville ne soit pas trop proche d'une autre
 				while (tabVille[i].x <= 5 || tabVille[i].y <= hauteurFenetre()/16+5 || (tabVille[i].x >= tabVille[j].x-100 && tabVille[i].x <= tabVille[j].x+100 && tabVille[i].y >= tabVille[j].y-100 && tabVille[i].y <= tabVille[j].y+100)) {
 					indice = true;
 					tabVille[i].x = valeurAleatoire()*largeurFenetre();
@@ -63,6 +65,7 @@ void generationVille(ville tabVille[10]) {
 	for (int i = 0; i < 10; i++) {
 		tabVille[i].x = 0;
 		tabVille[i].y = 0;
+		// Vérifie qu'une ville ne soit pas trop proche d'un des bords de l'écran
 		while (tabVille[i].x <= 5 || tabVille[i].y <= hauteurFenetre()/16+5 || (tabVille[i].x >= largeurFenetre()/2-150 && tabVille[i].x <= largeurFenetre()/2+150 && tabVille[i].y >= hauteurFenetre()/2+hauteurFenetre()/16-150 && tabVille[i].y <= hauteurFenetre()/2+hauteurFenetre()/16+150)) {
 			tabVille[i].x = valeurAleatoire()*largeurFenetre();
 			tabVille[i].y = valeurAleatoire()*hauteurFenetre();
@@ -79,15 +82,19 @@ void afficheVille(ville tabVille[10]) {
 }
 
 void afficheChemin(individu tabIndividu[10], ville tabVille[10], float *distance) {
+	// Affiche le meilleur chemin (celui avec la distance la plus courte)
 	int index = 0;
+	// Cherche l'individu avec la distance la plus courte
 	for (int i = 1; i < 10; i++)
 		if (tabIndividu[index].fitness > tabIndividu[i].fitness)
 			index = i;
 	couleurCourante(125, 0, 0);
 	epaisseurDeTrait(2);
+	// Affiche l'individu en question
 	for (int i = 1; i < 10; i++)
 		ligne(tabVille[tabIndividu[index].chemin[i-1]].x, tabVille[tabIndividu[index].chemin[i-1]].y, tabVille[tabIndividu[index].chemin[i]].x, tabVille[tabIndividu[index].chemin[i]].y);
 	ligne(tabVille[tabIndividu[index].chemin[0]].x, tabVille[tabIndividu[index].chemin[0]].y, tabVille[tabIndividu[index].chemin[9]].x, tabVille[tabIndividu[index].chemin[9]].y);
+	// Enregistre sa distance
 	*distance = tabIndividu[index].fitness;
 }
 
@@ -108,7 +115,9 @@ void gestionEvenement(EvenementGfx evenement) {
 	
 	switch (evenement) {
 		case Initialisation:
+			// Génération des villes
 			generationVille(tabVille);
+			// Génération des individus
 			generationIndividu(tabIndividu);
 			// Calcul la distance des individus
 			fitness(tabIndividu, tabVille);
@@ -147,8 +156,10 @@ void gestionEvenement(EvenementGfx evenement) {
 			// Affiche d'une chaîne de caractères à l'écran
 			couleurCourante(0, 0, 0);
 			epaisseurDeTrait(2);
+			// Meilleure distance (la plus courte)
 			sprintf(afficheDistance, "Distance: %f", distance);
 			afficheChaine(afficheDistance, hauteurFenetre()/32, largeurFenetre()/2, hauteurFenetre()/64);
+			// Génération actuelle
 			sprintf(afficheEvolution, "Evolution n.%d", evolution);
 			afficheChaine(afficheEvolution, hauteurFenetre()/32, largeurFenetre()/128, hauteurFenetre()/64);
 			break;
@@ -167,8 +178,6 @@ void gestionEvenement(EvenementGfx evenement) {
 						modePleinEcran();
 					else
 						redimensionneFenetre(LargeurFenetre, HauteurFenetre);
-					// Génération des villes
-					generationVille(tabVille);
 					break;
 
 				case 'C':
@@ -196,8 +205,6 @@ void gestionEvenement(EvenementGfx evenement) {
 			break;
 		
 		case Redimensionnement:
-			// Génération des villes
-			generationVille(tabVille);
 			break;
 	}
 }
