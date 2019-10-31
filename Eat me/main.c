@@ -7,6 +7,7 @@
 #define LargeurFenetre 1200
 #define HauteurFenetre 720
 
+// Structure contenant les informations (position) de la nourriture
 typedef struct nourriture {
 	float x, y;
 } nourriture;
@@ -40,12 +41,13 @@ void generationIndividu(individu tabIndividu[10]) {
 	}
 }
 
-void checkNourriture(nourriture tabNourriture[20]) {
+void checkNourriture(nourriture tabNourriture[NB_NOURRITURES]) {
 	// Vérifie que les paniers ne soient pas trop proches
 	bool indice = false;
-	for (int i = 0; i < 20; i++) {
-		for (int j = 0; j < 20; j++) {
+	for (int i = 0; i < NB_NOURRITURES; i++) {
+		for (int j = 0; j < NB_NOURRITURES; j++) {
 			if (i != j) {
+				// Regarde la position de la nourriture par rapport aux autres et la repositionne si trop proche
 				while (tabNourriture[i].x <= 5 || tabNourriture[i].y <= hauteurFenetre()/16+5 || (tabNourriture[i].x >= largeurFenetre()/2-150 && tabNourriture[i].x <= largeurFenetre()/2+150 && tabNourriture[i].y >= hauteurFenetre()/2+hauteurFenetre()/16-150 && tabNourriture[i].y <= hauteurFenetre()/2+hauteurFenetre()/16+150) || (tabNourriture[i].x >= tabNourriture[j].x-100 && tabNourriture[i].x <= tabNourriture[j].x+100 && tabNourriture[i].y >= tabNourriture[j].y-100 && tabNourriture[i].y <= tabNourriture[j].y+100)) {
 					indice = true;
 					tabNourriture[i].x = valeurAleatoire()*largeurFenetre();
@@ -61,11 +63,12 @@ void checkNourriture(nourriture tabNourriture[20]) {
 	}
 }
 
-void generationNourriture(nourriture tabNourriture[20]) {
+void generationNourriture(nourriture tabNourriture[NB_NOURRITURES]) {
 	// Génération de la nourriture sur le terrain
-	for (int i = 0; i < 20; i++) {
+	for (int i = 0; i < NB_NOURRITURES; i++) {
 		tabNourriture[i].x = 0;
 		tabNourriture[i].y = 0;
+		// Regarde si la nourriture n'est pas trop proche des bords de l'écran
 		while (tabNourriture[i].x <= 5 || tabNourriture[i].y <= hauteurFenetre()/16+5 || (tabNourriture[i].x >= largeurFenetre()/2-150 && tabNourriture[i].x <= largeurFenetre()/2+150 && tabNourriture[i].y >= hauteurFenetre()/2+hauteurFenetre()/16-150 && tabNourriture[i].y <= hauteurFenetre()/2+hauteurFenetre()/16+150)) {
 			tabNourriture[i].x = valeurAleatoire()*largeurFenetre();
 			tabNourriture[i].y = valeurAleatoire()*hauteurFenetre();
@@ -74,10 +77,10 @@ void generationNourriture(nourriture tabNourriture[20]) {
 	checkNourriture(tabNourriture);
 }
 
-void afficheIndividu(individu tabIndividu[10]) {
+void afficheIndividu(individu tabIndividu[NB_INDIVIDUS]) {
 	// Affiche les individus avec leur score
 	char scoreIndividu[100];
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < NB_INDIVIDUS; i++) {
 		couleurCourante(0, 0, 215);
 		cercle(tabIndividu[i].x, tabIndividu[i].y, 15);
 		couleurCourante(255, 255, 255);
@@ -87,16 +90,16 @@ void afficheIndividu(individu tabIndividu[10]) {
 	}
 }
 
-void afficheNourriture(nourriture tabNourriture[20]) {
+void afficheNourriture(nourriture tabNourriture[NB_NOURRITURES]) {
 	// Affiche la nourriture
 	couleurCourante(0, 125, 0);
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < NB_NOURRITURES; i++)
 		rectangle(tabNourriture[i].x-5, tabNourriture[i].y-5, tabNourriture[i].x+5, tabNourriture[i].y+5);
 }
 
-void deplacement(individu tabIndividu[10]) {
+void deplacement(individu tabIndividu[NB_INDIVIDUS]) {
 	// Déplacement aléatoire de l'individu selon ses caractéristiques
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < NB_INDIVIDUS; i++) {
 		// Détermine si changement de direction
 		tabIndividu[i].xVitesse = valeurIntervalleZeroUn()*100 <= tabIndividu[i].xProb ? -tabIndividu[i].xVitesse : tabIndividu[i].xVitesse;
 		tabIndividu[i].yVitesse = valeurIntervalleZeroUn()*100 <= tabIndividu[i].yProb ? -tabIndividu[i].yVitesse : tabIndividu[i].yVitesse;
@@ -115,14 +118,15 @@ void deplacement(individu tabIndividu[10]) {
 	}
 }
 
-void ramasse(individu tabIndividu[10], nourriture tabNourriture[20], int *score) {
-	for (int i = 0; i < 10; i++) {
+void ramasse(individu tabIndividu[NB_INDIVIDUS], nourriture tabNourriture[NB_NOURRITURES], int *score) {
+	for (int i = 0; i < NB_INDIVIDUS; i++) {
 		// Un individu peut seulement porter 5 paniers
 		if (tabIndividu[i].panier < 5) {
-			for (int j = 0; j < 20; j++) {
+			for (int j = 0; j < NB_NOURRITURES; j++) {
 				// Lorqu'un individu rentre en collision avec de la nourriture il l'a ramasse
 				if (tabIndividu[i].last != j && tabIndividu[i].x >= tabNourriture[j].x-20 && tabIndividu[i].x <= tabNourriture[j].x+20 && tabIndividu[i].y >= tabNourriture[j].y-20 && tabIndividu[i].y <= tabNourriture[j].y+20) {
 					tabIndividu[i].panier += 1;
+					// Enregistre le dernier panier ramassé pour éviter qu'il ne le ramasse indéfiniment
 					tabIndividu[i].last = j;
 				}
 			}
@@ -137,9 +141,9 @@ void ramasse(individu tabIndividu[10], nourriture tabNourriture[20], int *score)
 	}
 }
 
-void acceleration(individu tabIndividu[10], bool accelerate) {
+void acceleration(individu tabIndividu[NB_INDIVIDUS], bool accelerate) {
 	// Augmente ou réduit la vitesse des individus
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < NB_INDIVIDUS; i++) {
 		if (accelerate) {
 			tabIndividu[i].xVitesse *= 2;
 			tabIndividu[i].yVitesse *= 2;
@@ -148,6 +152,26 @@ void acceleration(individu tabIndividu[10], bool accelerate) {
 			tabIndividu[i].yVitesse /= 2;
 		}
 	}
+}
+
+// Détermine les caractéristiques moyennes des individus
+void moyenneCarac(individu tabIndividu[NB_INDIVIDUS], individu *moyenneIndividu) {
+	moyenneIndividu->xVitesse = 0;
+	moyenneIndividu->yVitesse = 0;
+	moyenneIndividu->xProb = 0;
+	moyenneIndividu->yProb = 0;
+	// Accumule chaque caractéristique
+	for (int i = 0; i < NB_INDIVIDUS; i++) {
+		moyenneIndividu->xVitesse += fabs(tabIndividu[i].xVitesse);
+		moyenneIndividu->yVitesse += fabs(tabIndividu[i].yVitesse);
+		moyenneIndividu->xProb += tabIndividu[i].xProb;
+		moyenneIndividu->yProb += tabIndividu[i].yProb;
+	}
+	// Divise par le nombre d'individus total
+	moyenneIndividu->xVitesse /= NB_INDIVIDUS;
+	moyenneIndividu->yVitesse /= NB_INDIVIDUS;
+	moyenneIndividu->xProb /= NB_INDIVIDUS;
+	moyenneIndividu->yProb /= NB_INDIVIDUS;
 }
 
 int main(int argc, char **argv) {
@@ -159,14 +183,16 @@ int main(int argc, char **argv) {
 
 void gestionEvenement(EvenementGfx evenement) {
 	static bool accelerate = false, pleinEcran = false;
-	static individu tabIndividu[10];
+	static individu tabIndividu[10], moyenneIndividu;
 	static nourriture tabNourriture[20];
 	static int score = 0, evolution = 0;
 	static char afficheScore[100], afficheEvolution[100];
 	
 	switch (evenement) {
 		case Initialisation:
+			// Génération de la nourriture
 			generationNourriture(tabNourriture);
+			// Génération des individus
 			generationIndividu(tabIndividu);
 			demandeTemporisation(20);
 			break;
@@ -177,9 +203,10 @@ void gestionEvenement(EvenementGfx evenement) {
 			// Ramassage de la nourriture
 			ramasse(tabIndividu, tabNourriture, &score);
 			// Sélection automatique
-			if (score >= 100) {
+			if (score >= 50) {
 				score = 0;
 				transformation(tabIndividu);
+				// Passe à la génération suivante
 				evolution += 1;
 			}
 			rafraichisFenetre();
@@ -205,9 +232,12 @@ void gestionEvenement(EvenementGfx evenement) {
 			// Affiche d'une chaîne de caractères à l'écran
 			couleurCourante(0, 0, 0);
 			epaisseurDeTrait(2);
+			// Affiche le score
 			sprintf(afficheScore, "Score: %d", score);
 			afficheChaine(afficheScore, hauteurFenetre()/32, 7*largeurFenetre()/8, hauteurFenetre()/64);
-			sprintf(afficheEvolution, "Evolution n.%d", evolution);
+			// Affiche la génération courante
+			moyenneCarac(tabIndividu, &moyenneIndividu);
+			sprintf(afficheEvolution, "Evolution n.%d | Moyenne xV: %.2f, yV: %.2f, xP: %.2f, yP: %.2f", evolution, moyenneIndividu.xVitesse, moyenneIndividu.yVitesse, moyenneIndividu.xProb, moyenneIndividu.yProb);
 			afficheChaine(afficheEvolution, hauteurFenetre()/32, largeurFenetre()/128, hauteurFenetre()/64);
 			break;
 			
@@ -215,6 +245,7 @@ void gestionEvenement(EvenementGfx evenement) {
 			switch (caractereClavier()) {
 				case 'A':
 				case 'a':
+					// Double ou réduit la vitesse des individus
 					accelerate = !accelerate;
 					acceleration(tabIndividu, accelerate);
 					break;

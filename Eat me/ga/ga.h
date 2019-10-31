@@ -1,3 +1,7 @@
+#define NB_NOURRITURES 20
+#define NB_INDIVIDUS 10
+
+// Contient les informations des individus
 typedef struct individu {
 	float xVitesse, yVitesse;
 	float xProb, yProb;
@@ -7,4 +11,4 @@ typedef struct individu {
 	int last;
 } individu;
 
-void transformation(individu tabIndividu[10]);
+void transformation(individu tabIndividu[NB_INDIVIDUS]);

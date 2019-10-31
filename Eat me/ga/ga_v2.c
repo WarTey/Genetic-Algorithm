@@ -13,9 +13,9 @@ bool compareIndividu(individu fIndividu, individu sIndividu) {
 	return false;
 }
 
-individu selectionIndividus(individu tabIndividu[10]) {
+individu selectionIndividus(individu tabIndividu[NB_INDIVIDUS]) {
 	// Sélection de deux individus par tournoi
-	int fAlea = valeurIntervalleZeroUn()*10, sAlea = valeurIntervalleZeroUn()*10;
+	float fAlea = valeurIntervalleZeroUn()*NB_INDIVIDUS, sAlea = valeurIntervalleZeroUn()*NB_INDIVIDUS;
 	individu fIndividu = tabIndividu[fAlea];
 	individu sIndividu = tabIndividu[sAlea];
 	// Garde l'individu avec le score le plus élevé
@@ -23,8 +23,8 @@ individu selectionIndividus(individu tabIndividu[10]) {
 }
 
 // Crée des paires d'individus
-void paire(individu tabIndividu[10], individu paireIndividu[5][2]) {
-	for (int i = 0; i < 5; i++) {
+void paire(individu tabIndividu[NB_INDIVIDUS], individu paireIndividu[NB_INDIVIDUS-1][2]) {
+	for (int i = 0; i < NB_INDIVIDUS-1; i++) {
 		individu fIndividu = selectionIndividus(tabIndividu);
 		individu sIndividu = selectionIndividus(tabIndividu);
 		// Recherche un autre individu tant qu'il est similaire au premier
@@ -53,18 +53,18 @@ void crossover(float *newIndividu, float fParam, float sParam, int cMin, int cMa
 	}
 }
 
-void transformation(individu tabIndividu[10]) {
+void transformation(individu tabIndividu[NB_INDIVIDUS]) {
 	// On ajoute les paniers au score total de chaque individu
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < NB_INDIVIDUS; i++) {
 		tabIndividu[i].total += tabIndividu[i].panier;
 		tabIndividu[i].panier = 0;
 	}
-	// On choisit 5 paires d'individus qui vont être 'crossover'
-	individu paireIndividu[5][2];
+	// On choisit NB_INDIVIDUS-1 paires d'individus qui vont être 'crossover'
+	individu paireIndividu[NB_INDIVIDUS-1][2];
 	paire(tabIndividu, paireIndividu);
-	// On crée 5 nouveaux individus
-	individu newIndividu[5];
-	for (int i = 0; i < 5; i++) {
+	// On crée NB_INDIVIDUS-1 nouveaux individus
+	individu newIndividu[NB_INDIVIDUS-1];
+	for (int i = 0; i < NB_INDIVIDUS-1; i++) {
 		// Applique un crossover sur chaque gène
 		newIndividu[i].panier = 0;
 		int min = paireIndividu[i][0].total < paireIndividu[i][1].total ? paireIndividu[i][0].total : paireIndividu[i][1].total;
@@ -78,8 +78,8 @@ void transformation(individu tabIndividu[10]) {
 		crossover(&(newIndividu[i].yVitesse), paireIndividu[i][0].yVitesse, paireIndividu[i][1].yVitesse, 1, 5);
 	}
 	// Tri nos individus
-	for (int i = 0; i < 9; i++) {
-		for (int j = i+1; j < 10; j++) {
+	for (int i = 0; i < NB_INDIVIDUS-1; i++) {
+		for (int j = i+1; j < NB_INDIVIDUS; j++) {
 			if (tabIndividu[i].total < tabIndividu[j].total) {
 				individu temp = tabIndividu[i];
 				tabIndividu[i] = tabIndividu[j];
@@ -88,8 +88,8 @@ void transformation(individu tabIndividu[10]) {
 		}
 	}
 	// Remplace nos individus les plus faibles par les nouveaux
-	for (int i = 0; i < 5; i++)
-		tabIndividu[i+5] = newIndividu[i];
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < NB_INDIVIDUS/2; i++)
+		tabIndividu[i+NB_INDIVIDUS/2] = newIndividu[i];
+	for (int i = 0; i < NB_INDIVIDUS; i++)
 		tabIndividu[i].total = 0;
 }
