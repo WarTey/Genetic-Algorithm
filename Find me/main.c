@@ -8,6 +8,7 @@ int main(void) {
     // Déclaration des variables nécessaires
     int generation = 0, indice = 0, taillePop = 0;
     bool found = false;
+    // Dictionnaire contenant toutes les lettres à utiliser
     chaine dic = "abcdefghijklmnopqrstuvwxyz ";
     mot answer = {0};
 
@@ -36,7 +37,7 @@ int main(void) {
     // Affiche la population de départ
     afficheGeneration(initPop, generation, taillePop);
     while (!found) {
-        // Ajoute une pause pour voir l'évolution de notre population
+        // Ajoute une courte pause pour voir l'évolution de notre population
         usleep(50000);
         // Augmente la génération actuelle
         generation += 1;
@@ -46,6 +47,6 @@ int main(void) {
         fitness(initPop, answer, &found, taillePop);
         afficheGeneration(initPop, generation, taillePop);
     }
-    // Quand une ressemble à 90% est trouvée, affiche ce message
+    // Quand une ressemble à 90% est trouvée, affiche ce message et fin de la boucle
     printf("Il y a une ressemblance à 90%%.\n");
 }

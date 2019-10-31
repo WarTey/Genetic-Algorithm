@@ -45,8 +45,10 @@ void frise(population *initPop, mot gene, int total, int taillePop) {
 // Crée des paires d'individus pour le crossover
 void paire(population *initPop, population pairePop[][2], int taillePop) {
     int total = 0;
+    // Accumule le score de tout les individus
     for (int i = 0; i < taillePop; i++)
         total += initPop[i].fitness + 10;
+    // Création des paires
     for (int i = 0; i < taillePop-1; i++) {
         frise(initPop, pairePop[i][0].gene, total, taillePop);
         frise(initPop, pairePop[i][1].gene, total, taillePop);
@@ -69,9 +71,9 @@ void create(mot gene, population pairePop[][2], int indice, int taillePop) {
 void crossover(population *initPop, int taillePop) {
     population pairePop[taillePop-1][2];
     population newPop[taillePop-1];
-    // Détermine 9 paires d'individus
+    // Détermine taillePop-1 paires d'individus
     paire(initPop, pairePop, taillePop);
-    // Initialise 9 nouveaux individus en fonction des paires précédentes
+    // Initialise taillePop-1 nouveaux individus en fonction des paires précédentes
     for (int i = 0; i < taillePop-1; i++)
         create(newPop[i].gene, pairePop, i, taillePop);
     // Détermine l'individu avec le meilleur score
@@ -79,7 +81,7 @@ void crossover(population *initPop, int taillePop) {
     for (int i = 1; i < 10; i++)
         if (initPop[top].fitness < initPop[i].fitness)
             top = i;
-    // Remplace les individus par les nouveaux
+    // Remplace les individus par les nouveaux sauf le meilleur qui est conservé
     int index = 0;
     for (int k = 0; k < taillePop-1; k++) {
         if (index == top)
