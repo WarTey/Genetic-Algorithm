@@ -1,5 +1,8 @@
+#define NB_INDIVIDUS 10
+#define NB_VILLES 10
+
 typedef struct individu {
-	int chemin[10];
+	int chemin[NB_VILLES];
 	float fitness;
 } individu;
 
@@ -7,7 +10,7 @@ typedef struct ville {
 	float x, y;
 } ville;
 
-void fitness(individu tabIndividu[10], ville tabVille[10]);
-void afficheGeneration(individu tabIndividu[10], int generation);
-void crossover(individu tabIndividu[10]);
-void mutation(individu tabIndividu[10]);
+void fitness(individu tabIndividu[NB_INDIVIDUS], ville tabVille[NB_VILLES]);
+void afficheGeneration(individu tabIndividu[NB_INDIVIDUS], int generation);
+void crossover(individu tabIndividu[NB_INDIVIDUS]);
+void mutation(individu tabIndividu[NB_INDIVIDUS]);
