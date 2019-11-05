@@ -66,8 +66,8 @@ void checkNourriture(nourriture tabNourriture[NB_NOURRITURES]) {
 void generationNourriture(nourriture tabNourriture[NB_NOURRITURES]) {
 	// Génération de la nourriture sur le terrain
 	for (int i = 0; i < NB_NOURRITURES; i++) {
-		tabNourriture[i].x = 0;
-		tabNourriture[i].y = 0;
+		tabNourriture[i].x = valeurAleatoire()*largeurFenetre();
+		tabNourriture[i].y = valeurAleatoire()*hauteurFenetre();
 		// Regarde si la nourriture n'est pas trop proche des bords de l'écran
 		while (tabNourriture[i].x <= 5 || tabNourriture[i].y <= hauteurFenetre()/16+5 || (tabNourriture[i].x >= largeurFenetre()/2-150 && tabNourriture[i].x <= largeurFenetre()/2+150 && tabNourriture[i].y >= hauteurFenetre()/2+hauteurFenetre()/16-150 && tabNourriture[i].y <= hauteurFenetre()/2+hauteurFenetre()/16+150)) {
 			tabNourriture[i].x = valeurAleatoire()*largeurFenetre();
@@ -183,8 +183,8 @@ int main(int argc, char **argv) {
 
 void gestionEvenement(EvenementGfx evenement) {
 	static bool accelerate = false, pleinEcran = false;
-	static individu tabIndividu[10], moyenneIndividu;
-	static nourriture tabNourriture[20];
+	static individu tabIndividu[NB_INDIVIDUS], moyenneIndividu;
+	static nourriture tabNourriture[NB_NOURRITURES];
 	static int score = 0, evolution = 0;
 	static char afficheScore[100], afficheEvolution[100];
 	
