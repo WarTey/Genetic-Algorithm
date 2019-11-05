@@ -19,17 +19,21 @@ void cercle(float centreX, float centreY, float rayon) {
 	}
 }
 
+// Affiche la fonction
 void drawFonction(float intervalMin, float intervalMax) {
 	epaisseurDeTrait(2);
 	couleurCourante(255, 0, 0);
+	// Trace le graphique de x^2 avec un point à chaque valeur entière (0, 1, 2, ...)
 	for (int i = 0; i < intervalMax; i++) {
 		ligne(i*(largeurFenetre()/intervalMax), pow(i, 2), (i+1)*(largeurFenetre()/intervalMax), pow(i+1, 2));
         cercle((i+1)*(largeurFenetre()/intervalMax), pow(i+1, 2), 3);
     }
 }
 
+// Affiche les solutions au problème
 void drawSolution(population *individu, int taillePop, float intervalMax) {
 	couleurCourante(0, 255, 0);
+	// Affiche un cercle correspondant à la solution de chaque individu
     for (int i = 0; i < taillePop; i++)
 		cercle(individu[i].valeur*(largeurFenetre()/intervalMax), individu[i].fitness, 3);
 }
@@ -63,8 +67,11 @@ void gestionEvenement(EvenementGfx evenement) {
                 printf("Saisir la chance d'appliquer une mutation sur un gène (0-100): ");
                 scanf("%d", &chanceMutation);
             } while (chanceMutation < 0 || chanceMutation > 100);
+			// Initialise notre population
             initPop(individu, POPULATION_SIZE, intervalMin, intervalMax);
+			// Affiche (dans le terminal) la population courante
             affichePop(individu, POPULATION_SIZE, generation);
+			// Affiche différentes caractéristiques de notre population
             stats(individu, POPULATION_SIZE, intervalMin, intervalMax);
 			demandeTemporisation(200);
 			break;
@@ -72,6 +79,7 @@ void gestionEvenement(EvenementGfx evenement) {
 		case Temporisation:
 			if (generation < 500) {
                 generation += 1;
+				// Voir les commentaires des fonctions correspondantes
                 crossover(individu, POPULATION_SIZE, intervalMin, intervalMax);
                 mutation(individu, POPULATION_SIZE, intervalMin, intervalMax, chanceMutation);
                 affichePop(individu, POPULATION_SIZE, generation);
@@ -83,7 +91,9 @@ void gestionEvenement(EvenementGfx evenement) {
 		case Affichage:
 			// Départ écran blanc
 			effaceFenetre (255, 255, 255);
+			// Affiche la fonction x^2
 			drawFonction(intervalMin, intervalMax);
+			// Affiche les solutions
             drawSolution(individu, POPULATION_SIZE, intervalMax);
 			break;
 			
