@@ -31,7 +31,7 @@ void transformation(individu tabIndividu[NB_INDIVIDUS]) {
 	for (int i = 0; i < NB_INDIVIDUS; i++) {
 		tabIndividu[i] = newIndividu[i];
 		tabIndividu[i].total = 0;
-		if (valeurIntervalleZeroUn() >= 0.90) {
+		if (valeurIntervalleZeroUn() >= 0.9) {
 			alea = valeurIntervalleZeroUn()*4;
 			switch(alea) {
 				case 0:

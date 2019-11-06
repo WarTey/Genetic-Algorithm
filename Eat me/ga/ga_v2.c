@@ -39,13 +39,15 @@ void crossover(float *newIndividu, float fParam, float sParam, int cMin, int cMa
 	// Crossover du gène
 	int min = fParam < sParam ? fParam : sParam;
 	int max = fParam > sParam ? fParam : sParam;
+	// Génère un valeur aléatoire compris entre les deux bornes
 	*newIndividu = valeurIntervalleZeroUn()*(max-min)+min;
-	// Mutation
+	// Mutation (on ajoute ou soustrait à notre valeur un peu plus pour ajouter un peu d'aléatoire)
 	if (valeurAleatoire() < 0.1) {
 		float indice = (valeurAleatoire() < 0.5 ? -1 : 1)*valeurIntervalleZeroUn()*(cMax-cMin)*0.5;
 		if ((*newIndividu == cMin && indice < 0) || (*newIndividu == cMax && indice > 0))
 			indice = -indice;
 		*newIndividu += indice;
+		// Pour ne pas que n'autre individu dépasse les bornes
 		if (*newIndividu < cMin)
 			*newIndividu = cMin;
 		if (*newIndividu > cMax)
