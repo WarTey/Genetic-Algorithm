@@ -113,7 +113,7 @@ void crossover(individu tabIndividu[NB_INDIVIDUS]) {
 void mutation(individu tabIndividu[NB_INDIVIDUS]) {
     for (int i = 0; i < NB_INDIVIDUS; i++) {
         // Une mutation à 1% de chance de s'appliquer
-        if (valeurIntervalleZeroUn() <= 0.01) {
+        if (valeurIntervalleZeroUn() <= 0.05) {
             // Choisis un chemin aléatoire et une position aléatoire
             int chemin = valeurIntervalleZeroUn()*NB_VILLES;
             int index = valeurIntervalleZeroUn()*NB_VILLES;
